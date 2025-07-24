@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/vadimi/grpc-client-cli/internal/descwrap"
+	"github.com/avysochin256/grpc-client-cli/internal/descwrap"
 )
 
 type serviceMetadataProto struct {

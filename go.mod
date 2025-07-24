@@ -1,4 +1,4 @@
-module github.com/vadimi/grpc-client-cli
+module github.com/avysochin256/grpc-client-cli
 
 go 1.24.0
 

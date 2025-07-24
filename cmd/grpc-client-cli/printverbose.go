@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/avysochin256/grpc-client-cli/internal/rpc"
 	"github.com/gookit/color"
-	"github.com/vadimi/grpc-client-cli/internal/rpc"
 	"google.golang.org/grpc/status"
 )
 

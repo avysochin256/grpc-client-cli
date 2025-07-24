@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vadimi/grpc-client-cli/internal/descwrap"
+	"github.com/avysochin256/grpc-client-cli/internal/descwrap"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 )

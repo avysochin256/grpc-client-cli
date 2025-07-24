@@ -5,7 +5,7 @@ import (
 	"io"
 	"regexp"
 
-	"github.com/vadimi/grpc-client-cli/internal/caller"
+	"github.com/avysochin256/grpc-client-cli/internal/caller"
 )
 
 // collapse empty array to one line

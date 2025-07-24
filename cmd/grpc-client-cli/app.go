@@ -13,9 +13,9 @@ import (
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/vadimi/grpc-client-cli/internal/caller"
-	"github.com/vadimi/grpc-client-cli/internal/descwrap"
-	"github.com/vadimi/grpc-client-cli/internal/rpc"
+	"github.com/avysochin256/grpc-client-cli/internal/caller"
+	"github.com/avysochin256/grpc-client-cli/internal/descwrap"
+	"github.com/avysochin256/grpc-client-cli/internal/rpc"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/reflect/protodesc"
