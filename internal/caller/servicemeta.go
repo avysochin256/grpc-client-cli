@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/vadimi/grpc-client-cli/internal/descwrap"
-	refl "github.com/vadimi/grpc-client-cli/internal/reflection"
-	"github.com/vadimi/grpc-client-cli/internal/rpc"
+	"github.com/avysochin256/grpc-client-cli/internal/descwrap"
+	refl "github.com/avysochin256/grpc-client-cli/internal/reflection"
+	"github.com/avysochin256/grpc-client-cli/internal/rpc"
 	"google.golang.org/grpc"
 )
 

@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/vadimi/grpc-client-cli/internal/resolver/eureka"
+	"github.com/avysochin256/grpc-client-cli/internal/resolver/eureka"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"

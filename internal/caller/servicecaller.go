@@ -7,7 +7,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/vadimi/grpc-client-cli/internal/rpc"
+	"github.com/avysochin256/grpc-client-cli/internal/rpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/connectivity"
@@ -16,7 +16,7 @@ import (
 	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/types/dynamicpb"
 
-	"github.com/vadimi/grpc-client-cli/internal/descwrap"
+	"github.com/avysochin256/grpc-client-cli/internal/descwrap"
 )
 
 // Proto message format

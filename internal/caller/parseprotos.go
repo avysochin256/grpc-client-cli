@@ -10,7 +10,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/vadimi/grpc-client-cli/internal/descwrap"
+	"github.com/avysochin256/grpc-client-cli/internal/descwrap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/types/descriptorpb"
