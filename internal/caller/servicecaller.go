@@ -16,7 +16,7 @@ import (
 	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/types/dynamicpb"
 
-	"github.com/jhump/protoreflect/desc"
+	"github.com/vadimi/grpc-client-cli/internal/descwrap"
 )
 
 // Proto message format
@@ -116,7 +116,7 @@ func NewServiceCaller(connFact *rpc.GrpcConnFactory, inMsgFormat, outMsgFormat M
 	}
 }
 
-func (sc *ServiceCaller) CallStream(ctx context.Context, serviceTarget string, methodDesc *desc.MethodDescriptor, messages [][]byte, callOpts ...grpc.CallOption) (chan []byte, chan error) {
+func (sc *ServiceCaller) CallStream(ctx context.Context, serviceTarget string, methodDesc *descwrap.MethodDescriptor, messages [][]byte, callOpts ...grpc.CallOption) (chan []byte, chan error) {
 	errChan := make(chan error, 1)
 	conn, err := sc.getConn(serviceTarget)
 	if err != nil {
@@ -196,7 +196,7 @@ func (sc *ServiceCaller) CallStream(ctx context.Context, serviceTarget string, m
 }
 
 // CallClientStream allows calling unary or client stream methods as they both return only a single result
-func (sc *ServiceCaller) CallClientStream(ctx context.Context, serviceTarget string, methodDesc *desc.MethodDescriptor, messages [][]byte, callOpts ...grpc.CallOption) ([]byte, error) {
+func (sc *ServiceCaller) CallClientStream(ctx context.Context, serviceTarget string, methodDesc *descwrap.MethodDescriptor, messages [][]byte, callOpts ...grpc.CallOption) ([]byte, error) {
 	if len(messages) == 0 {
 		return nil, newCallerError(errors.New("empty requests are not allowed"))
 	}

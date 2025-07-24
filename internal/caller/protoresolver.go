@@ -3,25 +3,39 @@ package caller
 import (
 	"errors"
 
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/builder"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/runtime/protoiface"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/dynamicpb"
 )
 
-var customAnyDescr *desc.MessageDescriptor
+var customAnyDescr protoreflect.MessageDescriptor
 
 func init() {
-	md, err := builder.NewMessage("any").
-		AddField(builder.NewField("err", builder.FieldTypeString())).
-		Build()
+	md := &descriptorpb.DescriptorProto{
+		Name: proto.String("any"),
+		Field: []*descriptorpb.FieldDescriptorProto{
+			{
+				Name:   proto.String("err"),
+				Number: proto.Int32(1),
+				Label:  descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum(),
+				Type:   descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum(),
+			},
+		},
+	}
+	fd := &descriptorpb.FileDescriptorProto{
+		Syntax:      proto.String("proto3"),
+		Name:        proto.String("any.proto"),
+		MessageType: []*descriptorpb.DescriptorProto{md},
+	}
+	f, err := protodesc.NewFile(fd, nil)
 	if err != nil {
 		panic(err)
 	}
-
-	customAnyDescr = md
+	customAnyDescr = f.Messages().Get(0)
 }
 
 type protoResolver struct {
@@ -37,7 +51,7 @@ func (t *protoResolver) FindMessageByURL(url string) (protoreflect.MessageType, 
 	mt, err := t.Types.FindMessageByURL(url)
 	if err != nil {
 		if errors.Is(err, protoregistry.NotFound) {
-			msg := dynamicpb.NewMessage(customAnyDescr.UnwrapMessage())
+			msg := dynamicpb.NewMessage(customAnyDescr)
 			return &unknownMsgType{msg}, nil
 		}
 		return mt, err

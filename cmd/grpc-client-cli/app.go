@@ -13,11 +13,12 @@ import (
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/protoprint"
 	"github.com/vadimi/grpc-client-cli/internal/caller"
+	"github.com/vadimi/grpc-client-cli/internal/descwrap"
 	"github.com/vadimi/grpc-client-cli/internal/rpc"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/prototext"
+	"google.golang.org/protobuf/reflect/protodesc"
 )
 
 var errNoMethod = errors.New("no method")
@@ -189,7 +190,7 @@ func (a *app) Close() error {
 	return nil
 }
 
-func (a *app) callService(method *desc.MethodDescriptor, message []byte) error {
+func (a *app) callService(method *descwrap.MethodDescriptor, message []byte) error {
 	for {
 		buf := newMsgBuffer(&msgBufferOptions{
 			reader:      a.messageReader,
@@ -254,7 +255,7 @@ func (a *app) callService(method *desc.MethodDescriptor, message []byte) error {
 }
 
 // callClientStream calls unary or client stream method
-func (a *app) callClientStream(ctx context.Context, method *desc.MethodDescriptor, messageJSON [][]byte) error {
+func (a *app) callClientStream(ctx context.Context, method *descwrap.MethodDescriptor, messageJSON [][]byte) error {
 	serviceCaller := caller.NewServiceCaller(a.connFact, a.opts.InFormat, a.opts.OutFormat, a.opts.OutJsonNames)
 
 	result, err := serviceCaller.CallClientStream(ctx, a.opts.Target, method, messageJSON, grpc.WaitForReady(true))
@@ -273,7 +274,7 @@ func (a *app) printResult(r []byte) {
 }
 
 // callStream calls both server or bi-directional stream methods
-func (a *app) callStream(ctx context.Context, method *desc.MethodDescriptor, messageJSON [][]byte) error {
+func (a *app) callStream(ctx context.Context, method *descwrap.MethodDescriptor, messageJSON [][]byte) error {
 	serviceCaller := caller.NewServiceCaller(a.connFact, a.opts.InFormat, a.opts.OutFormat, a.opts.OutJsonNames)
 	result, errChan := serviceCaller.CallStream(ctx, a.opts.Target, method, messageJSON, grpc.WaitForReady(true))
 
@@ -325,14 +326,16 @@ func (a *app) printService(name string) error {
 	normalizedName := strings.ToLower(name)
 	for _, s := range a.servicesList {
 		if normalizedName != "" && strings.Contains(strings.ToLower(s.Name), normalizedName) {
-			p := &protoprint.Printer{}
-			return p.PrintProtoFile(s.File, a.w)
+			fdProto := protodesc.ToFileDescriptorProto(s.File.UnwrapFile())
+			b, _ := prototext.Marshal(fdProto)
+			_, err := a.w.Write(b)
+			return err
 		}
 	}
 	return fmt.Errorf("service %s not found, cannot print", name)
 }
 
-func (a *app) selectMethod(s *caller.ServiceMeta, name string) (*desc.MethodDescriptor, error) {
+func (a *app) selectMethod(s *caller.ServiceMeta, name string) (*descwrap.MethodDescriptor, error) {
 	noMethod := "[..]"
 	methodNames := []string{noMethod}
 	for _, m := range s.Methods {

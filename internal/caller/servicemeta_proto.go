@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jhump/protoreflect/desc"
+	"github.com/vadimi/grpc-client-cli/internal/descwrap"
 )
 
 type serviceMetadataProto struct {
@@ -53,6 +53,6 @@ func (smp *serviceMetadataProto) GetServiceMetaDataList(ctx context.Context) (Se
 	return res, nil
 }
 
-func (smp *serviceMetadataProto) GetAdditionalFiles() ([]*desc.FileDescriptor, error) {
+func (smp *serviceMetadataProto) GetAdditionalFiles() ([]*descwrap.FileDescriptor, error) {
 	return smp.serviceMetaBase.GetAdditionalFiles(smp.protoImports)
 }
