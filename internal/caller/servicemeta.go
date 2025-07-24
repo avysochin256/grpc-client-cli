@@ -4,11 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/grpcreflect"
+	"github.com/vadimi/grpc-client-cli/internal/descwrap"
+	refl "github.com/vadimi/grpc-client-cli/internal/reflection"
 	"github.com/vadimi/grpc-client-cli/internal/rpc"
 	"google.golang.org/grpc"
-	rpb "google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
 )
 
 type serviceMetaData struct {
@@ -76,10 +75,14 @@ func (s *serviceMetaData) GetServiceMetaDataList(ctx context.Context) (ServiceMe
 		}
 
 		svcData := &ServiceMeta{
-			File:    svcDesc.GetFile(),
-			Name:    svcDesc.GetFullyQualifiedName(),
-			Methods: svcDesc.GetMethods(),
+			File: descwrap.WrapFile(svcDesc.ParentFile()),
+			Name: string(svcDesc.FullName()),
 		}
+		methods := make([]*descwrap.MethodDescriptor, svcDesc.Methods().Len())
+		for j := 0; j < svcDesc.Methods().Len(); j++ {
+			methods[j] = &descwrap.MethodDescriptor{MD: svcDesc.Methods().Get(j)}
+		}
+		svcData.Methods = methods
 
 		for _, m := range svcData.Methods {
 			u := newJsonNamesUpdater()
@@ -93,14 +96,15 @@ func (s *serviceMetaData) GetServiceMetaDataList(ctx context.Context) (ServiceMe
 	return res, nil
 }
 
-func (s *serviceMetaData) GetAdditionalFiles() ([]*desc.FileDescriptor, error) {
+func (s *serviceMetaData) GetAdditionalFiles() ([]*descwrap.FileDescriptor, error) {
 	return s.serviceMetaBase.GetAdditionalFiles(s.protoImports)
 }
 
-func (s *serviceMetaData) grpcReflectClient(ctx context.Context, conn grpc.ClientConnInterface) *grpcreflect.Client {
+func (s *serviceMetaData) grpcReflectClient(ctx context.Context, conn grpc.ClientConnInterface) *refl.Client {
 	if s.reflectVersion == GrpcReflectAuto {
-		return grpcreflect.NewClientAuto(ctx, conn)
+		c, _ := refl.NewClient(ctx, conn, refl.Auto)
+		return c
 	}
-	rpbclient := rpb.NewServerReflectionClient(conn)
-	return grpcreflect.NewClientV1Alpha(ctx, rpbclient)
+	c, _ := refl.NewClient(ctx, conn, refl.V1Alpha)
+	return c
 }

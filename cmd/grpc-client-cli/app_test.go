@@ -10,11 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jhump/protoreflect/desc"
 	"github.com/spyzhov/ajson"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/vadimi/grpc-client-cli/internal/caller"
+	"github.com/vadimi/grpc-client-cli/internal/descwrap"
 	"github.com/vadimi/grpc-client-cli/internal/rpc"
 	app_testing "github.com/vadimi/grpc-client-cli/internal/testing"
 	"google.golang.org/grpc/codes"
@@ -571,7 +571,7 @@ func jsonString(n *ajson.Node, jsonPath string) string {
 	return nodes[0].MustString()
 }
 
-func findMethod(t *testing.T, app *app, serviceName, methodName string) (*desc.MethodDescriptor, bool) {
+func findMethod(t *testing.T, app *app, serviceName, methodName string) (*descwrap.MethodDescriptor, bool) {
 	m, err := app.selectMethod(app.getService(serviceName), methodName)
 	if err != nil {
 		t.Error(err)

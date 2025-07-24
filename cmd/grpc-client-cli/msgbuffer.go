@@ -9,11 +9,11 @@ import (
 	"os"
 	"slices"
 
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/desc/protoprint"
 	"github.com/vadimi/grpc-client-cli/internal/caller"
+	"github.com/vadimi/grpc-client-cli/internal/descwrap"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/encoding/prototext"
+	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/dynamicpb"
 )
@@ -30,7 +30,7 @@ type msgBuffer struct {
 
 type msgBufferOptions struct {
 	reader      MsgReader
-	messageDesc *desc.MessageDescriptor
+	messageDesc *descwrap.MessageDescriptor
 	msgFormat   caller.MsgFormat
 	w           io.Writer
 }
@@ -156,7 +156,7 @@ func fieldNames(messageDesc protoreflect.MessageDescriptor) []string {
 	return names
 }
 
-func getMessageDefaults(messageDesc *desc.MessageDescriptor) string {
+func getMessageDefaults(messageDesc *descwrap.MessageDescriptor) string {
 	msg := dynamicpb.NewMessage(messageDesc.UnwrapMessage())
 	msgJSON, _ := protojson.MarshalOptions{
 		EmitDefaultValues: true,
@@ -166,13 +166,11 @@ func getMessageDefaults(messageDesc *desc.MessageDescriptor) string {
 	return string(msgJSON)
 }
 
-func protoString(messageDesc *desc.MessageDescriptor) string {
-	p := protoprint.Printer{
-		Compact: true,
-	}
-	str, err := p.PrintProtoToString(messageDesc)
+func protoString(messageDesc *descwrap.MessageDescriptor) string {
+	fdProto := protodesc.ToDescriptorProto(messageDesc.UnwrapMessage())
+	b, err := prototext.MarshalOptions{Multiline: false}.Marshal(fdProto)
 	if err != nil {
-		str = fmt.Sprintf("error printing proto: %v", err)
+		return fmt.Sprintf("error printing proto: %v", err)
 	}
-	return str
+	return string(b)
 }
